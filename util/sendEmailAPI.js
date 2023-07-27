@@ -6,28 +6,27 @@ module.exports = async (email, subject, text) => {
         throw new Error("No recipient email specified");
     }
 
-    const transport = nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
       host: process.env.HOST,
       service: process.env.SERVICE,
       port: Number(process.env.EMAIL_PORT),
-      secure: process.env.SECURE === 'true',
+      secure: Boolean(process.env.SECURE),
       auth: {
         user: process.env.ADMIN,
         pass: process.env.PASS,
       },
     });
 
-    await transport.sendMail({
+    await transporter.sendMail({
       from: process.env.ADMIN,
-       to: 'lefevrekirk@gmail.com',
-      // to: email,
+      to: email,
       subject: subject,
-      text: text,
+      text: text
     });
 
-    console.log("Email sent!");
+    console.log("Email sent Successfully");
   } catch (error) {
-    console.log("Email not sent :(");
+    console.log("Email not sent");
     console.log(error);
   }
 };

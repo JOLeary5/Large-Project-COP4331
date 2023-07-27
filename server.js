@@ -1,35 +1,32 @@
 require("dotenv").config();
+
 const path = require("path");
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
-const registerRoutes = require("./routes/registerAPI");
-const loginRoutes = require("./routes/loginAPI");
-const forgotRoutes = require("./routes/forgotAPI");
-const resetRoutes = require("./routes/resetAPI");
-const createRoutes = require("./routes/createAPI");
 
+const authenticateRoutes = require("./routes/authenticate");
+const tripRoutes = require("./routes/trip");
+const userRoutes = require("./routes/user");
 
 // express app
 const app = express();
 
 
 // middleware
+app.use(express.json());
+
+
+// routes
+app.use("/api", authenticateRoutes);
+app.use("/api/trips", tripRoutes);
+app.use("/api/user", userRoutes);
+
 app.use(express.static(path.join(__dirname + "/frontend/build")));
 // AFTER defining routes: Anything that doesn't match what's above, 
 // send back server.html;
 // app.get('*', (req, res) => {
 //   res.sendFile(path.join(__dirname + '/../frontend/build/server.html'))
 // })
-app.use(express.json());
-app.use(cors());
-
-// routes
-app.use("/api/register", registerRoutes);
-app.use("/api/login", loginRoutes);
-app.use("/api/forgot", forgotRoutes);
-app.use("/api/reset", resetRoutes);
-app.use("/api/create", createRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("frontend/build"));
@@ -47,6 +44,7 @@ const connectionParams = {
 		useUnifiedTopology: true,
 };
 
+//This is where mongoose tries to connect to the MongoDB 
 mongoose.connect(process.env.MONGODB_URI, connectionParams)
 .then(() => {
   // listen for requests
